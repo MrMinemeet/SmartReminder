@@ -85,17 +85,21 @@ def reload_people():
 def main():
     camera = PiCamera()
     camera.resolution = (1024, 768)
+    print("Camera Done")
 
     speaker = pyttsx3.init()
     spi = busio.SPI(clock=SCK, MOSI=MOSI, MISO=MISO)
     display = ili9341.ILI9341(spi, cs=digitalio.DigitalInOut(D2), dc=digitalio.DigitalInOut(D3))
+    print("Display Done")
 
     reload_people()
+    print("Loading Done")
 
     client = mqtt.Client()
     client.on_connect = on_connect
     client.on_message = on_message
     client.connect(MOSQUITTO_SERVER_IP, MOSQUITTO_SERVER_PORT, 60)
+    print("MQTT Done")
     client.loop_forever()
 
 if __name__ == "__main__":
