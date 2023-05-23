@@ -11,7 +11,7 @@ import digitalio
 from board import SCK, MOSI, MISO, D2, D3
 
 MOSQUITTO_SERVER_IP = 'main.local'
-MOSQUITTO_SERVER_PORT = 1883
+MOSQUITTO_SERVER_PORT = 8883
 DATA_FILE = 'data.json'
 DOOR_TOPIC = 'door'
 UPDATE_PERSON_TOPIC = 'update-person'
