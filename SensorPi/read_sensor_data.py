@@ -1,6 +1,11 @@
 import time
 import datetime
 import RPi.GPIO as GPIO
+import paho.mqtt.client as mqtt
+
+# Callback-Function
+def on_connect(client, userdata, flags, rc):
+    print("Connected: " + str(rc))
 
 def sensorCallback(channelHall, channelPressure):
   timestamp = time.time()
@@ -12,6 +17,21 @@ def sensorCallback(channelHall, channelPressure):
           if(not GPIO.input(channelPressure)):
               # Open door
               print("Person opened the door " + stamp)
+
+              broker = "mqtt.example.com"
+              port = 1883
+
+              client = mqtt.Client()
+
+              # create connection
+              client.on_connect = on_connect
+              client.connect(broker, port, 60)
+
+              # send message to broker
+              client.publish("door", "Person opened the door")
+
+              break
+    time.sleep(5) # wait before checking for open door again
 
 def main():
   try:
