@@ -3,7 +3,6 @@ import datetime
 import RPi.GPIO as GPIO
 
 def sensorCallback(channelHall, channelPressure):
-  # Called if sensor output changes
   timestamp = time.time()
   stamp = datetime.datetime.fromtimestamp(timestamp).strftime('%H:%M:%S')
 
@@ -13,7 +12,7 @@ def sensorCallback(channelHall, channelPressure):
           if(not GPIO.input(channelPressure)):
               # Open door
               print("Person opened the door " + stamp)
-              
+
 def main():
   try:
     # Loop until users quits with CTRL-C
