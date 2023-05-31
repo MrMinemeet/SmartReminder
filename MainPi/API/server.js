@@ -1,6 +1,6 @@
 const EXPRESS = require('express');
 const MQTT = require('mqtt');
-//const CLIENT = MQTT.connect('mqtt://localhost:8883');
+const CLIENT = MQTT.connect('mqtt://main.local:1883');
 
 const APP = EXPRESS();
 const PORT =  8080;
@@ -30,15 +30,14 @@ APP.post('/addImage/:personName', (req, res) => {
 	CLIENT.publish('addImage', jsonData);
 });
 
-APP.get('/addTask', (req, res) => { 
+
 	// Just send the recieved data over MQTT to the broker
 	res.send('addTask');
 	//CLIENT.publish('addTask', req.body.value);
 });
 
-APP.get('/getTask', (req, res) => {
-	res.send('getTask');
-	//CLIENT.publish('getTask', req.body.value);
+APP.get('/getData/:personName/:date', (req, res) => {
+	res.send("Getting Tasks for " + req.params.personName + " on " + req.params.date);
 });
 
 APP.listen(PORT, () => {
