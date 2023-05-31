@@ -8,8 +8,12 @@ import face_recognition
 from picamera import PiCamera
 import busio
 import digitalio
-from board import SCK, MOSI, MISO, D2, D3
+from board import SCK, MOSI, MISO, CE0, D24, D25
 
+CS_PIN = CE0
+DC_PIN = D25
+RESET_PIN = D24
+BAUDRATE = 24000000
 MOSQUITTO_SERVER_IP = 'main.local'
 MOSQUITTO_SERVER_PORT = 8883
 DATA_FILE = 'data.json'
@@ -42,10 +46,12 @@ def handle_door():
 
 def display_todos(todos):
     global display
+    display.fill(0)
     image = Image.new("RGB", (display.width, display.height))
     draw = ImageDraw.Draw(image)
-    draw.rectangle((0, 0, display.width, display.height), outline=0, fill=(0, 0, 0))
-    #TODO uhhh i dunno yet
+    draw.rectangle((0, 0, display.width, display.height),
+                   outline=0, fill=(0, 0, 0))
+    # TODO uhhh i dunno yet
     draw.text((0, 0), todos[0]['name'].join('\n'), fill="#FFFFFF")
     display.image(image)
 
@@ -53,26 +59,28 @@ def clear_display():
     global display
     image = Image.new("RGB", (display.width, display.height))
     draw = ImageDraw.Draw(image)
-    draw.rectangle((0, 0, display.width, display.height), outline=0, fill=(0, 0, 0))
+    draw.rectangle((0, 0, display.width, display.height),
+                   outline=0, fill=(0, 0, 0))
     display.image(image)
 
 def say_todos(todos):
     global speaker
-    #TODO due date
+    # TODO due date
     for todo in todos:
-        speaker.say(todo['name'])
-        speaker.runAndWait()
-        speaker.say(todo['decription'])
-        speaker.runAndWait()
-        speaker.say(f"Fällig am {todo['decription']}")
-        speaker.runAndWait()
+        #speaker.say(todo['name'])
+        #speaker.runAndWait()
+        #speaker.say(todo['decription'])
+        #speaker.runAndWait()
+        #speaker.say(f"Fällig am {todo['decription']}")
+        #speaker.runAndWait()
 
 def try_detect_tasks_for_person():
     time = time.time()
     global tasks
     while time.time() - time < DETECTION_TIMEOUT_MS * 1000:
-        snap = cam.read() #TODO optimize image (rescale, ...)
-        encoding = face_recognition.face_encodings(snap)[0] #TODO no clue if this is working
+        snap = cam.read()  # TODO optimize image (rescale, ...)
+        encoding = face_recognition.face_encodings(
+            snap)[0]  # TODO no clue if this is working
         results = face_recognition.compare_faces(images, encoding)
         if len(results) > 0:
             first_match_index = results.index(True)
@@ -97,10 +105,20 @@ def reload_tasks():
 
 def main():
     global speaker
-    #speaker = pyttsx3.init()
+    # speaker = pyttsx3.init()
     spi = busio.SPI(clock=SCK, MOSI=MOSI, MISO=MISO)
     global display
-    display = ili9341.ILI9341(spi, cs=digitalio.DigitalInOut(D2), dc=digitalio.DigitalInOut(D3))
+    display = ST7789(
+        spi,
+        rotation=90,
+        width=135,
+        height=240,
+        x_offset=53,
+        y_offset=40,
+        baudrate=BAUDRATE,
+        cs=digitalio.DigitalInOut(CS_PIN),
+        dc=digitalio.DigitalInOut(DC_PIN),
+        rst=digitalio.DigitalInOut(RESET_PIN))
     print("Display Done")
 
     say_todos([{
