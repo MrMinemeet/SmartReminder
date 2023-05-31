@@ -7,7 +7,16 @@ const PORT =  8080;
 
 APP.use(require('body-parser').text());
 APP.use(EXPRESS.urlencoded({ extended: false })); // Parse URL-encoded data in request body
-
+APP.use((req, res, next) => {
+	console.log('---');
+	console.log('New connection received');
+	console.log('Method:', req.method);
+	console.log('URL:', req.originalUrl);
+	console.log('Timestamp:', new Date().toISOString());
+	console.log('---');
+  
+	next();
+});
 
 APP.get('/', (req, res) => {
 	  res.send('Hello World!');
