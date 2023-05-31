@@ -23,9 +23,11 @@ APP.get('/', (req, res) => {
 });
 
 APP.post('/addImage/:personName', (req, res) => {
-	res.send('addImage for ' + req.params.personName);
-	console.log(req.body)
-	//CLIENT.publish('addImage', req.body.value);
+	const image = req.body;
+	const personName = req.params.personName;
+	const jsonData = JSON.stringify({personName, image});
+	res.send('addImage send json data: \n' + jsonData);
+	CLIENT.publish('addImage', jsonData);
 });
 
 APP.get('/addTask', (req, res) => { 
