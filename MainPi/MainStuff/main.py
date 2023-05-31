@@ -17,7 +17,7 @@ DOOR_TOPIC = 'door'
 UPDATE_PERSON_TOPIC = 'update-person'
 DETECTION_TIMEOUT_MS = 2000
 
-people = []
+tasks = []
 images = []
 camera = None
 speaker = None
@@ -31,20 +31,21 @@ def on_message(client, userdata, msg):
     if msg.topic == DOOR_TOPIC:
         handle_door()
     elif msg.topic == UPDATE_PERSON_TOPIC:
-        reload_people()
+        reload_tasks()
 
 def handle_door():
-    person = try_detect_person()
-    if person is not None:
-        display_todos(person)
-        say_todos(person)
+    todos = try_detect_tasks_for_person()
+    if todos is not None:
+        display_todos(todos)
+        say_todos(todos)
         clear_display()
 
-def display_todos(person):
+def display_todos(todos):
     image = Image.new("RGB", (display.width, display.height))
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, display.width, display.height), outline=0, fill=(0, 0, 0))
-    draw.text((0, 0), person['todos'].join('\n'), fill="#FFFFFF")
+    #TODO uhhh i dunno yet
+    draw.text((0, 0), todos[0]['name'].join('\n'), fill="#FFFFFF")
     display.image(image)
 
 def clear_display():
@@ -53,12 +54,17 @@ def clear_display():
     draw.rectangle((0, 0, display.width, display.height), outline=0, fill=(0, 0, 0))
     display.image(image)
 
-def say_todos(person):
-    for todo in person['todos']:
-        speaker.say(todo)
+def say_todos(todos):
+    #TODO due date
+    for todo in todos:
+        speaker.say(todo['name'])
+        speaker.runAndWait()
+        speaker.say(todo['decription'])
+        speaker.runAndWait()
+        speaker.say(f"Fällig am {todo['decription']}")
         speaker.runAndWait()
 
-def try_detect_person():
+def try_detect_tasks_for_person():
     time = time.time()
     while time.time() - time < DETECTION_TIMEOUT_MS * 1000:
         snap = cam.read() #TODO optimize image (rescale, ...)
@@ -66,33 +72,41 @@ def try_detect_person():
         results = face_recognition.compare_faces(images, encoding)
         if len(results) > 0:
             first_match_index = results.index(True)
-            return people[first_match_index]
+            return tasks[first_match_index]
     return None
 
-def reload_people():
+def reload_tasks():
     data = json.load(DATA_FILE)
-    people = []
+    tasks = []
     images = []
-    for person in data:
-        image = face_recognition.load_image_file(person['image'])
-        encoding = face_recognition.face_encodings(image)[0]
-        images.append(encoding)
-        people.append({
-            'name': person['name'],
-            'todos': person['todos']
-        })
+
+    people_groups = groupby(data, key=lambda x: x['personName'])
+    index = -1
+    for task, person in people_groups:
+        if person not in people:
+            index += 1
+            images.append(face_recognition.load_image_file(person['image']))
+            tasks.append([])
+        tasks[index].append(task)
 
 def main():
-    camera = PiCamera()
-    camera.resolution = (1024, 768)
-    print("Camera Done")
-
     speaker = pyttsx3.init()
     spi = busio.SPI(clock=SCK, MOSI=MOSI, MISO=MISO)
     display = ili9341.ILI9341(spi, cs=digitalio.DigitalInOut(D2), dc=digitalio.DigitalInOut(D3))
     print("Display Done")
 
-    reload_people()
+    say_todos([{
+        'name': 'Elias'
+    }])
+    display_todos([{
+        'name': 'Elias'
+    }])
+
+    camera = PiCamera()
+    camera.resolution = (1024, 768)
+    print("Camera Done")
+
+    reload_tasks()
     print("Loading Done")
 
     client = mqtt.Client()
