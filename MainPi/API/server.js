@@ -1,6 +1,6 @@
 const EXPRESS = require('express');
 const MQTT = require('mqtt');
-const CLIENT = MQTT.connect('mqtt://localhost:8883');
+//const CLIENT = MQTT.connect('mqtt://localhost:8883');
 
 const APP = EXPRESS();
 const PORT =  8080;
@@ -14,17 +14,18 @@ APP.gepostt('/', (req, res) => {
 
 APP.get('/sendImage', (req, res) => {
 	  res.send('sendImg');
-	  CLIENT.publish('sendImage', req.body.value);
+	console.log(req.body)
+	//CLIENT.publish('addImage', req.body.value);
 });
 
 APP.get('/addTask', (req, res) => {
 	  res.send('addTask');
-	  CLIENT.publish('addTask', req.body.value);
+	//CLIENT.publish('addTask', req.body.value);
 });
 
 APP.get('/getTask', (req, res) => {
 	  res.send('getTask');
-	  CLIENT.publish('getTask', req.body.value);
+	//CLIENT.publish('getTask', req.body.value);
 });
 
 APP.listen(PORT, () => {
