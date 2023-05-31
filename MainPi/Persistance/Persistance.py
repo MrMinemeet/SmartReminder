@@ -12,7 +12,7 @@ JSONPath: str = "datafile.json"
 imagePath: str = "images"
 
 indexes = dict()
-
+index = 0
 logger = logging.getLogger(__name__)
 logging.basicConfig(level="INFO")
 
@@ -22,15 +22,26 @@ def on_connect(client, userdata, flags, rc):
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe("addTask", qos=0)
-
+    client.subscribe("addImage", qos=0)
+    client.subscribe("getTask", qos=0)
+    client.subscribe("getData", qos=0)
+    client.subscribe("getPeople", qos=0)
 
 def on_message(client, userdata, msg):
+    if msg.topic == "addImage":
+        print(msg.payload)
+    elif msg.topic == "addTask":
+        print(msg.payload)
+    elif msg.topic == "getTask":
+         print(msg.topic)
     commandString = str(msg.payload)
     print(commandString)
 
 
 def addTask(name: str, personName: str, description: str, dueDate: str):
-    task = Task.Task(name, description, personName, getFreeIndex(), dueDate)
+    global index
+    task = Task.Task(name, description, personName, index, dueDate)
+    index = index + 1
     tasks = getJsonTasks()
 
     tasks.append(task)
@@ -129,7 +140,7 @@ if __name__ == '__main__':
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.connect("main.local", 1883, keepalive=60)
+    client.connect("192.168.18.16", 1883, keepalive=60)
     try:
         client.loop_forever()
     except (KeyboardInterrupt, SystemExit):
