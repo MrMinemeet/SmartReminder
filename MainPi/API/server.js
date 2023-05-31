@@ -105,6 +105,30 @@ APP.get('/getAllPerson', async (req, res) => {
 		res.status(504).send(error.message);
 	});
 });
+
+APP.get('/removeTask', async (req, res) => {
+	const taskId = req.query.id;
+	CLIENT.publish('removeTask', taskId);
+	CLIENT.subscribe('removeTaskResponse');
+	const response = await new Promise((resolve, reject) => {
+		CLIENT.on('message', (topic, message) => {
+			if (topic === 'removeTaskResponse') {
+				resolve(message.toString());
+			}
+		});
+		setTimeout(() => {
+			reject(new Error('Timeout for removeTaskResponse'));
+		}, 5000); // Set a timeout of 5 seconds
+	}).then((response) => {
+		CLIENT.unsubscribe('removeTaskResponse');
+		console.log('Response:', response);
+		res.send(response);
+	}).catch((error) => {
+		console.error(error.message);
+		res.status(504).send(error.message);
+	});
+});
+
 APP.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}`);
 });
