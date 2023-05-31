@@ -18,10 +18,6 @@ APP.use((req, res, next) => {
 	next();
 });
 
-APP.get('/', (req, res) => {
-	  res.send('Hello World!');
-});
-
 APP.post('/addImage/:personName', (req, res) => {
 	const image = req.body;
 	const personName = req.params.personName;
@@ -29,8 +25,6 @@ APP.post('/addImage/:personName', (req, res) => {
 	res.send('addImage send json data: \n' + jsonData);
 	CLIENT.publish('addImage', jsonData);
 });
-
-
 
 APP.post('/addTask', (req, res) => { 
 	// Just send the recieved data over MQTT to the broker
@@ -90,6 +84,27 @@ APP.get('/getData/:personName/:date', async (req, res) => {
 
 });
 
+APP.get('/getAllPerson', async (req, res) => {
+	CLIENT.publish('getAllPerson', '');
+	CLIENT.subscribe('getAllPersonResponse');
+	const response = await new Promise((resolve, reject) => {
+		CLIENT.on('message', (topic, message) => {
+			if (topic === 'getAllPersonResponse') {
+				resolve(message.toString());
+			}
+		});
+		setTimeout(() => {
+			reject(new Error('Timeout for getAllPersonResponse'));
+		}, 5000); // Set a timeout of 5 seconds
+	}).then((response) => {
+		CLIENT.unsubscribe('getAllPersonResponse');
+		console.log('Response:', response);
+		res.send(response);
+	}).catch((error) => {
+		console.error(error.message);
+		res.status(504).send(error.message);
+	});
+});
 APP.listen(PORT, () => {
 	console.log(`Server listening on port ${PORT}`);
 });
