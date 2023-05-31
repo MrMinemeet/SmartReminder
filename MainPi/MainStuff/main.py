@@ -50,7 +50,9 @@ def display_todos(todos):
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, display.height, display.width),
                    outline=0, fill=(0, 0, 0))
-    draw.text((0, 0), todos[0]['name'], fill="#FFFFFF")
+    font = ImageFont.load_default()
+    font = font.font_variant(size=24)
+    draw.text((0, 0), todos[0]['name'], fill="#FFFFFF", font=font)
     image = image.transpose(Image.FLIP_LEFT_RIGHT)
     display.image(image)
 
