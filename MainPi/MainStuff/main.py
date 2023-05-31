@@ -46,14 +46,13 @@ def handle_door():
 
 def display_todos(todos):
     global display
-    image = Image.new("RGB", (display.width, display.height))
+    image = Image.new("RGB", (display.height, display.width))
     draw = ImageDraw.Draw(image)
-    draw.rectangle((0, 0, display.width, display.height),
+    draw.rectangle((0, 0, display.height, display.width),
                    outline=0, fill=(0, 0, 0))
     # TODO uhhh i dunno yet
     draw.text((0, 0), todos[0]['name'].join('\n'), fill="#FFFFFF")
     display.image(image)
-    print(image.width, image.height)
 
 def clear_display():
     global display
@@ -111,7 +110,7 @@ def main():
     global display
     display = ST7789(
         spi,
-        rotation=0,
+        rotation=90,
         width=135,
         height=240,
         x_offset=53,
