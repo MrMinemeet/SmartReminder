@@ -7,7 +7,6 @@ from typing_extensions import TypedDict
 JSONPath: str = "datafile.json"
 imagePath: str = ""
 
-tasks = []
 indexes = dict()
 
 
@@ -15,8 +14,14 @@ def addTask(name: str, personName: str, description: str, dueDate: str):
     task = Task.Task(name, description, personName, getFreeIndex(), dueDate)
 
     print(task)
-    tasks.append(task)
-
+    with open(JSONPath, "r") as file:
+        if file.read() == "":
+            json.dump(task, file, default=Task.Task.to_json)
+        else:
+            data = json.load(file)
+            data += task.toJson
+            print(data)
+            json.dump(data, file)
     return
 
 
@@ -24,12 +29,14 @@ def removeTask(id: int) -> bool:
     with open(JSONPath, "r") as file:
         data = json.load(file)
         for d in data:
-            if (d["id"] == id):
+            if d["id"] == id:
                 print(d)
                 return True
 
     return False
 
+
+# save the image as jpeg somewhere and notify elias
 def addImage(personName: str, image):
     raise NotImplementedError
 
@@ -42,7 +49,7 @@ def getData(personName: str, date=None) -> str:
             print(data[0])  # this is a dict str:str
         else:
             for d in data:
-                if (d["dueDate"] == date):
+                if d["dueDate"] == date:
                     print(d)
 
 
@@ -69,8 +76,5 @@ def getAllPeople():
 if __name__ == '__main__':
     addTask("test", "this is a test", "Name1", "11.09.2001")
     addTask("test2", "this is a test too", "Name2", "11.09.2001")
-
-    with open(JSONPath, "a+") as file:
-        json.dump(tasks, file, default=Task.Task.to_json)
 
     getData("")
