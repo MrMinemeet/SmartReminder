@@ -50,8 +50,8 @@ def display_todos(todos):
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, display.height, display.width),
                    outline=0, fill=(0, 0, 0))
-    # TODO uhhh i dunno yet
-    draw.text((0, 0), todos[0]['name'].join('\n'), fill="#FFFFFF")
+    draw.text((0, 0), todos[0]['name'], fill="#FFFFFF")
+    image = image.transpose(Image.FLIP_LEFT_RIGHT)
     display.image(image)
 
 def clear_display():
@@ -78,7 +78,7 @@ def try_detect_tasks_for_person():
     time = time.time()
     global tasks
     while time.time() - time < DETECTION_TIMEOUT_MS * 1000:
-        snap = cam.read()  # TODO optimize image (rescale, ...)
+        snap = cam.read() # TODO optimize image (rescale, ...)
         encoding = face_recognition.face_encodings(
             snap)[0]  # TODO no clue if this is working
         results = face_recognition.compare_faces(images, encoding)
@@ -113,8 +113,8 @@ def main():
         rotation=90,
         width=135,
         height=240,
-        x_offset=53,
-        y_offset=40,
+        x_offset=0,
+        y_offset=0,
         baudrate=BAUDRATE,
         cs=digitalio.DigitalInOut(CS_PIN),
         dc=digitalio.DigitalInOut(DC_PIN),
