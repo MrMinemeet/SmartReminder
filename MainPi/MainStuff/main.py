@@ -41,6 +41,7 @@ def handle_door():
         clear_display()
 
 def display_todos(todos):
+    global display
     image = Image.new("RGB", (display.width, display.height))
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, display.width, display.height), outline=0, fill=(0, 0, 0))
@@ -49,12 +50,14 @@ def display_todos(todos):
     display.image(image)
 
 def clear_display():
+    global display
     image = Image.new("RGB", (display.width, display.height))
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, display.width, display.height), outline=0, fill=(0, 0, 0))
     display.image(image)
 
 def say_todos(todos):
+    global speaker
     #TODO due date
     for todo in todos:
         speaker.say(todo['name'])
@@ -66,6 +69,7 @@ def say_todos(todos):
 
 def try_detect_tasks_for_person():
     time = time.time()
+    global tasks
     while time.time() - time < DETECTION_TIMEOUT_MS * 1000:
         snap = cam.read() #TODO optimize image (rescale, ...)
         encoding = face_recognition.face_encodings(snap)[0] #TODO no clue if this is working
@@ -77,7 +81,9 @@ def try_detect_tasks_for_person():
 
 def reload_tasks():
     data = json.load(DATA_FILE)
+    global tasks
     tasks = []
+    global images
     images = []
 
     people_groups = groupby(data, key=lambda x: x['personName'])
@@ -90,8 +96,10 @@ def reload_tasks():
         tasks[index].append(task)
 
 def main():
-    speaker = pyttsx3.init()
+    global speaker
+    #speaker = pyttsx3.init()
     spi = busio.SPI(clock=SCK, MOSI=MOSI, MISO=MISO)
+    global display
     display = ili9341.ILI9341(spi, cs=digitalio.DigitalInOut(D2), dc=digitalio.DigitalInOut(D3))
     print("Display Done")
 
