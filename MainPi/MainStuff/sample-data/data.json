@@ -1,0 +1,16 @@
+[
+    {
+        "taskId": 0,
+        "name": "Do the dishes",
+        "description": "i dunno what to say, just do them?",
+        "personName": "Obama",
+        "dueDate": "???"
+    },
+    {
+        "taskId": 1,
+        "name": "Clean the sofa",
+        "description": "Again, i dunno what to say, just do them?",
+        "personName": "Obama",
+        "dueDate": "???"
+    }
+]
