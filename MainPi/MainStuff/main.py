@@ -111,8 +111,8 @@ def main():
     display = ST7789(
         spi,
         rotation=90,
-        width=135,
-        height=240,
+        width=240,
+        height=320,
         x_offset=0,
         y_offset=0,
         baudrate=BAUDRATE,
