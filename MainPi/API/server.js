@@ -62,8 +62,32 @@ APP.get('/getTask', async (req, res) => {
 	CLIENT.unsubscribe('getTaskResponse');
 });
 
-APP.get('/getData/:personName/:date', (req, res) => {
-	res.send("Getting Tasks for " + req.params.personName + " on " + req.params.date);
+APP.get('/getData/:personName/:date', async (req, res) => {
+	const personName = req.params.personName;
+	const date = req.params.date;
+	CLIENT.publish('getData', JSON.stringify({personName, date}));
+	CLIENT.subscribe('getDataResponse');
+	const response = await new Promise((resolve, reject) => {
+		CLIENT.on('message', (topic, message) => {
+			if (topic === 'getDataResponse') {
+				resolve(message.toString());
+		  	} 
+		});
+		setTimeout(() => {
+		  reject(new Error('Timeout for getDataResponse'));
+		}, 5000); // Set a timeout of 5 seconds
+	}).then((response) => {
+		CLIENT.unsubscribe('getDataResponse');
+		console.log('Response:', response);
+		res.send(response);
+	}).catch((error) => {
+		console.error(error.message);
+		res.status(504).send(error.message);
+	});
+
+	// Return the response from the broker
+	res.send(response);
+
 });
 
 APP.listen(PORT, () => {
