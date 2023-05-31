@@ -1,16 +1,32 @@
-import json
-import typing
-import os
-import Task
-from typing_extensions import TypedDict
-import io
 import base64
+import io
+import json
+import os
+import logging
 from PIL import Image
+import paho.mqtt.client as mqtt
+import Task
+import time
 
 JSONPath: str = "datafile.json"
 imagePath: str = "images"
 
 indexes = dict()
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level="INFO")
+
+
+def on_connect(client, userdata, flags, rc):
+    logger.info('Connected with result code %s', str(rc))
+    # Subscribing in on_connect() means that if we lose the connection and
+    # reconnect then subscriptions will be renewed.
+    client.subscribe("addTask", qos=0)
+
+
+def on_message(client, userdata, msg):
+    commandString = str(msg.payload)
+    print(commandString)
 
 
 def addTask(name: str, personName: str, description: str, dueDate: str):
@@ -105,3 +121,18 @@ def convert_base64_to_jpg(base64_string, personName):
 
     # Save the image as JPEG
     image.save(imagePath + personName, 'PNG')
+
+
+if __name__ == '__main__':
+    # setup mqtt
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    client.connect("main.local", 1883, keepalive=60)
+    try:
+        client.loop_forever()
+    except (KeyboardInterrupt, SystemExit):
+        logger.info('disconnecting ...')
+        client.disconnect()
+        time.sleep(1)
