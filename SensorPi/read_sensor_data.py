@@ -18,8 +18,8 @@ def sensorCallback(channelHall, channelPressure):
               # Open door
               print("Person opened the door " + stamp)
 
-              broker = "main.local"
-              port = 8883
+              broker = "192.168.18.16"
+              port = 1883
 
               client = mqtt.Client()
 
