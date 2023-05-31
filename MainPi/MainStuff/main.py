@@ -2,7 +2,7 @@ import paho.mqtt.client as mqtt
 import json
 import time
 import pyttsx3
-import adafruit_rgb_display.ili9341 as ili9341
+from adafruit_rgb_display.st7789 import ST7789
 from PIL import Image, ImageDraw, ImageFont
 import face_recognition
 from picamera import PiCamera
@@ -67,6 +67,7 @@ def say_todos(todos):
     global speaker
     # TODO due date
     for todo in todos:
+        pass
         #speaker.say(todo['name'])
         #speaker.runAndWait()
         #speaker.say(todo['decription'])
