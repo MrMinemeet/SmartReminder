@@ -79,10 +79,6 @@ APP.get('/getData/:personName/:date', async (req, res) => {
 	}).finally(() => {
 		CLIENT.unsubscribe('getDataResponse');
 	});
-
-	// Return the response from the broker
-	res.send(response);
-
 });
 
 APP.get('/getAllPeople', async (req, res) => {
