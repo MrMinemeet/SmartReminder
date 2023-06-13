@@ -85,17 +85,17 @@ APP.get('/getData/:personName/:date', async (req, res) => {
 
 });
 
-APP.get('/getAllPerson', async (req, res) => {
-	CLIENT.subscribe('getAllPersonResponse');
-	CLIENT.publish('getAllPerson', '');
+APP.get('/getAllPeople', async (req, res) => {
+	CLIENT.subscribe('getAllPeopleResponse');
+	CLIENT.publish('getAllPeople', '');
 	const response = await new Promise((resolve, reject) => {
 		CLIENT.on('message', (topic, message) => {
-			if (topic === 'getAllPersonResponse') {
+			if (topic === 'getAllPeopleResponse') {
 				resolve(message.toString());
 			}
 		});
 		setTimeout(() => {
-			reject(new Error('Timeout for getAllPersonResponse'));
+			reject(new Error('Timeout for getAllPeopleResponse'));
 		}, 5000); // Set a timeout of 5 seconds
 	}).then((response) => {
 		console.log('Response:', response);
@@ -104,7 +104,7 @@ APP.get('/getAllPerson', async (req, res) => {
 		console.error(error.message);
 		res.status(504).send(error.message);
 	}).finally(() => {
-		CLIENT.unsubscribe('getAllPersonResponse');
+		CLIENT.unsubscribe('getAllPeopleResponse');
 	});
 });
 
