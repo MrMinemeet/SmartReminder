@@ -25,31 +25,68 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("addImage", qos=0)
     client.subscribe("getTask", qos=0)
     client.subscribe("getData", qos=0)
-    client.subscribe("getPeople", qos=0)
+    client.subscribe("getAllPeople", qos=0)
+    client.subscribe("removeTask", qos=0)
+
 
 def on_message(client, userdata, msg):
+    msg.payload = msg.payload.decode()
     if msg.topic == "addImage":
         print(msg.payload)
+        addImage(msg.payload)
     elif msg.topic == "addTask":
         print(msg.payload)
+        addTask(msg.payload)
     elif msg.topic == "getTask":
-         print(msg.topic)
+        print(msg.topic)
+        getTask(int(msg.payload))
+    elif msg.topic == "getData":
+        print(msg.topic)
+        getData(msg.payload)
+    elif msg.topic == "getAllPeople":
+        print(msg.topic)
+        getAllPeople()
+    elif msg.topic == "removeTask":
+        removeTask(int(msg.payload))
     commandString = str(msg.payload)
     print(commandString)
 
-
-def addTask(name: str, personName: str, description: str, dueDate: str):
-    global index
-    task = Task.Task(name, description, personName, index, dueDate)
-    index = index + 1
+def getTask(id: int):
     tasks = getJsonTasks()
+    for t in tasks:
+        if int(t["taskId"]) == id:
+            client.publish("getTaskResponse", json.dumps(t))
 
-    tasks.append(task)
+
+def addTask(jsonStr: str):
+    tasks = getJsonTasks()
+    tasks.append(jsonStr)
+    with open(JSONPath, "w") as file:
+        json.dump(tasks, file)
+
+    with open(JSONPath, "r") as file:
+        text: str = file.read()
+
+    text = text.replace("\\", "")
+    text = text.replace("\\", "")
+    text = text.replace("\"{\"", "{\"")
+    text = text.replace("\"}\"", "\"}")
 
     with open(JSONPath, "w") as file:
-        json.dump(tasks, file, default=Task.Task.to_json)
+        file.write(text)
 
-    return
+#def addTask(name: str, personName: str, description: str, dueDate: str):
+#    global index
+#    task = Task.Task(name, description, personName, index, dueDate)
+#    index = index + 1
+#    tasks = getJsonTasks()
+#
+#    tasks.append(task)
+#
+#    with open(JSONPath, "w") as file:
+#        json.dump(tasks, file, default=Task.Task.to_json)
+#
+#    return
 
 
 def getJsonTasks() -> []:
@@ -66,48 +103,49 @@ def getJsonTasks() -> []:
             return tasks
 
 
-def removeTask(id: int) -> bool:
+def removeTask(id: int):
     tasks = getJsonTasks()
     for t in tasks:
-        if t["id"] == id:
+        if int(t["taskId"]) == id:
+            client.publish("removeTaskResponse", json.dumps(t))
             tasks.remove(t)
-            return True
 
-    return False
+            with open(JSONPath, "w") as file:
+                json.dump(tasks, file)
+
+            with open(JSONPath, "r") as file:
+                text: str = file.read()
+
+            text = text.replace("\\", "")
+            text = text.replace("\\", "")
+            text = text.replace("\"{\"", "{\"")
+            text = text.replace("\"}\"", "\"}")
+
+            with open(JSONPath, "w") as file:
+                file.write(text)
 
 
 # save the image as jpeg somewhere and notify elias
-def addImage(personName: str, imageData):
+def addImage(payload: str):
+    data = json.loads(payload)
+    imageData = data["image"]
+    personName = data["personName"]
+
     convert_base64_to_jpg(imageData, personName)
 
-
-def getData(personName: str, date=None) -> str:
-    with open(JSONPath, "r") as file:
-        data = json.load(file)
-
-        if date is None:
-            print(data[0])  # this is a dict str:str
-        else:
-            for d in data:
-                if d["dueDate"] == date:
-                    print(d)
-    return ""
+    client.publish("ImageNotification", "personName")
 
 
-def getFreeIndex():
-    index = None
+def getData(payload: str):
 
-    for key in indexes.keys():
-        if not indexes[key]:
-            index = key
-            break
+    data = json.loads(payload)
+    date = data["date"]
+    name = data["personName"]
 
-    if index is None:
-        index = len(indexes.keys())
-
-    indexes[index] = True
-
-    return index
+    data = getJsonTasks()
+    for d in data:
+        if d["dueDate"] == date and d["personId"] == name:
+            client.publish("getDataResponse", json.dumps(d))
 
 
 def getAllPeople() -> []:
@@ -115,9 +153,9 @@ def getAllPeople() -> []:
     with open(JSONPath, "r") as file:
         data = json.load(file)
         for d in data:
-            people.append(d["personName"])
+            people.append(d["personId"])
 
-    return people
+    client.publish("getAllPeopleResponse", json.dumps(people))
 
 
 def convert_base64_to_jpg(base64_string, personName):
@@ -130,8 +168,8 @@ def convert_base64_to_jpg(base64_string, personName):
     # Open the image using PIL
     image = Image.open(image_stream)
 
-    # Save the image as JPEG
-    image.save(imagePath + personName, 'PNG')
+    # Save the image as PNG
+    image.save(os.path.join(imagePath, personName)+".png", 'PNG')
 
 
 if __name__ == '__main__':
@@ -140,7 +178,7 @@ if __name__ == '__main__':
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.connect("192.168.18.16", 1883, keepalive=60)
+    client.connect("iot.soft.uni-linz.ac.at", 1883, keepalive=60)
     try:
         client.loop_forever()
     except (KeyboardInterrupt, SystemExit):
