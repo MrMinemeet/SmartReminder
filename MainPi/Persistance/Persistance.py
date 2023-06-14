@@ -133,6 +133,7 @@ def getData(payload: str):
 
 
 def getAllPeople() -> list[str]:
+    # TODO: get app people not only those which have tasks. Look at images folder
     people = []
     with open(JSONPath, "r", encoding='utf-8') as file:
         data = json.load(file)
