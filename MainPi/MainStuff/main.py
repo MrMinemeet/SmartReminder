@@ -98,7 +98,7 @@ def try_detect_tasks_for_person():
     return None
 
 def reload_tasks():
-    with open(DATAPATH + DATA_FILE, 'r') as f:
+    with open(DATA_PATH + DATA_FILE, 'r') as f:
         data = json.load(f)
         global tasks
         tasks = []
@@ -112,7 +112,7 @@ def reload_tasks():
             if person != prev_person:
                 prev_person = person
                 index += 1
-                images.append(face_recognition.load_image_file(f'{DATAPATH}{person}.png'))
+                images.append(face_recognition.load_image_file(f'{DATA_PATH}{person}.png'))
                 tasks.append([])
             tasks[index].append(task)
 
