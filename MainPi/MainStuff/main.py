@@ -86,7 +86,7 @@ def try_detect_tasks_for_person():
     while time.time() - ttime < DETECTION_TIMEOUT_MS * 1000:
         print("Looking for face")
         snap = np.empty((camera.resolution[1], camera.resolution[0], 3), dtype=np.uint8)
-        camera.capture(frame, format='rgb') # TODO optimize image (rescale, ...)
+        camera.capture(snap, format='rgb') # TODO optimize image (rescale, ...)
         encoding = face_recognition.face_encodings(
             snap)[0]  # TODO no clue if this is working
         results = face_recognition.compare_faces(images, encoding)
