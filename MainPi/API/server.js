@@ -22,7 +22,7 @@ APP.post('/addImage/:personName', (req, res) => {
 	const image = req.body;
 	const personName = req.params.personName;
 	const jsonData = JSON.stringify({personName, image});
-	res.send('addImage send json data: \n' + jsonData);
+	res.status(200).send();
 });
 
 APP.post('/addTask', (req, res) => { 
@@ -104,7 +104,7 @@ APP.get('/getAllPeople', async (req, res) => {
 	});
 });
 
-APP.get('/removeTask', async (req, res) => {
+APP.get('/removeTask/:id', async (req, res) => {
 	const taskId = req.query.id;
 	CLIENT.subscribe('removeTaskResponse');
 	CLIENT.publish('removeTask', taskId);
