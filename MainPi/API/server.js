@@ -22,7 +22,7 @@ APP.post('/addImage/:personName', (req, res) => {
 	const image = req.body;
 	const personName = req.params.personName;
 	const jsonData = JSON.stringify({personName, image});
-	res.send('addImage send json data: \n' + jsonData);
+	res.status(200).send();
 });
 
 APP.post('/addTask', (req, res) => { 
