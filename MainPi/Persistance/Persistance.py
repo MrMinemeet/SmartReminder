@@ -51,6 +51,8 @@ def on_message(client, userdata, msg):
     commandString = str(msg.payload)
     print(commandString)
 
+    client.publish("update", "") # Just to notify the main programm that something new is here
+
 def getTask(id: int):
     tasks = getJsonTasks()
     for t in tasks:
@@ -132,8 +134,6 @@ def addImage(payload: str):
     personName = data["personName"]
 
     convert_base64_to_jpg(imageData, personName)
-
-    client.publish("ImageNotification", "personName")
 
 
 def getData(payload: str):
