@@ -117,7 +117,9 @@ def reload_tasks():
             if person != prev_person:
                 prev_person = person
                 index += 1
-                images.append(face_recognition.load_image_file(f'{DATA_PATH}{person}.png'))
+                face_image = face_recognition.load_image_file(f'{DATA_PATH}{person}.png')
+                face_encoding = face_recognition.face_encodings(face_image)[0]
+                images.append(face_encoding)
                 tasks.append([])
             tasks[index].append(task)
 
