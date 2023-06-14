@@ -91,12 +91,7 @@ def getJsonTasks() -> []:
             return []
         else:
             data = json.load(file)
-
-            tasks = []
-            for d in data:
-                tasks.append(d)
-
-            return tasks
+            return data
 
 
 def removeTask(id: int):
