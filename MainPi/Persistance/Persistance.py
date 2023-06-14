@@ -12,7 +12,6 @@ JSONPath: str = "datafile.json"
 imagePath: str = "images"
 
 indexes = dict()
-index = 0
 logger = logging.getLogger(__name__)
 logging.basicConfig(level="INFO")
 
@@ -62,20 +61,15 @@ def getTask(id: int):
 
 def addTask(jsonStr: str):
     tasks = getJsonTasks()
-    tasks.append(jsonStr)
+
+    # Convert jsonString to dict object and add to list
+    task = json.loads(jsonStr)
+    task["taskId"] = len(tasks) + 1
+    tasks.append(task)
+
+
     with open(JSONPath, "w") as file:
         json.dump(tasks, file)
-
-    with open(JSONPath, "r") as file:
-        text: str = file.read()
-
-    text = text.replace("\\", "")
-    text = text.replace("\\", "")
-    text = text.replace("\"{\"", "{\"")
-    text = text.replace("\"}\"", "\"}")
-
-    with open(JSONPath, "w") as file:
-        file.write(text)
 
 #def addTask(name: str, personName: str, description: str, dueDate: str):
 #    global index

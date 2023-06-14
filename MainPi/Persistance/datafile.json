@@ -1,1 +1,9 @@
-[{"taskId": "0", "name": "Lukas", "description": "BONK!, go to horny jail", "personId": 0, "dueDate": "11.09.2001"}, {"taskId": "1", "name": "Lukas", "description": "BONK!, go to horny jail", "personId": 0, "dueDate": "11.09.2001"}, {"taskId": "2", "name": "Lukas", "description": "BONK!, go to horny jail", "personId": 0, "dueDate": "11.09.2001"}]
+[
+  {
+    "name": "Booty",
+    "description": "do some booty workout",
+    "personName": "Adi",
+    "dueDate": "11.09.2001",
+    "taskId": 1
+  }
+]
