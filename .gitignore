@@ -2,3 +2,5 @@ MainPi/API/node_modules
 .idea.*
 
 MainPi/Persistance/__pycache__/Task.cpython-310.pyc
+
+.idea/
