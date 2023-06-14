@@ -3,32 +3,30 @@ import io
 import json
 import os
 import logging
+import time
 from PIL import Image
 import paho.mqtt.client as mqtt
-import Task
-import time
 
 JSONPath: str = "datafile.json"
 imagePath: str = "images"
 
-indexes = dict()
 logger = logging.getLogger(__name__)
 logging.basicConfig(level="INFO")
 
 
-def on_connect(client, userdata, flags, rc):
+def on_connect(mqttClient, userdata, flags, rc):
     logger.info('Connected with result code %s', str(rc))
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
-    client.subscribe("addTask", qos=0)
-    client.subscribe("addImage", qos=0)
-    client.subscribe("getTask", qos=0)
-    client.subscribe("getData", qos=0)
-    client.subscribe("getAllPeople", qos=0)
-    client.subscribe("removeTask", qos=0)
+    mqttClient.subscribe("addTask", qos=0)
+    mqttClient.subscribe("addImage", qos=0)
+    mqttClient.subscribe("getTask", qos=0)
+    mqttClient.subscribe("getData", qos=0)
+    mqttClient.subscribe("getAllPeople", qos=0)
+    mqttClient.subscribe("removeTask", qos=0)
 
 
-def on_message(client, userdata, msg):
+def on_message(mqttClient, userdata, msg):
     msg.payload = msg.payload.decode()
     if msg.topic == "addImage":
         print(msg.payload)
@@ -50,12 +48,12 @@ def on_message(client, userdata, msg):
     commandString = str(msg.payload)
     print(commandString)
 
-    client.publish("update", "") # Just to notify the main programm that something new is here
+    mqttClient.publish("update", "") # Just to notify the main programm that something new is here
 
-def getTask(id: int):
+def getTask(taskId: int):
     tasks = getJsonTasks()
     for t in tasks:
-        if int(t["taskId"]) == id:
+        if int(t["taskId"]) == taskId:
             client.publish("getTaskResponse", json.dumps(t))
 
 
@@ -68,7 +66,7 @@ def addTask(jsonStr: str):
     tasks.append(task)
 
 
-    with open(JSONPath, "w") as file:
+    with open(JSONPath, "w", encoding='utf-8') as file:
         json.dump(tasks, file)
 
 #def addTask(name: str, personName: str, description: str, dueDate: str):
@@ -85,8 +83,8 @@ def addTask(jsonStr: str):
 #    return
 
 
-def getJsonTasks() -> []:
-    with open(JSONPath, "r") as file:
+def getJsonTasks() -> list[dict]:
+    with open(JSONPath, "r", encoding='utf-8') as file:
         if os.path.getsize(JSONPath) == 0:
             return []
         else:
@@ -94,15 +92,15 @@ def getJsonTasks() -> []:
             return data
 
 
-def removeTask(id: int):
+def removeTask(taskId: int):
     print("remove")
     tasks = getJsonTasks()
     for t in tasks:
-        if int(t["taskId"]) == id:
+        if int(t["taskId"]) == taskId:
             client.publish("removeTaskResponse", json.dumps(t))
             tasks.remove(t)
 
-            with open(JSONPath, "w") as file:
+            with open(JSONPath, "w", encoding='utf-8') as file:
                 json.dump(tasks, file)
 
 
@@ -127,9 +125,9 @@ def getData(payload: str):
             client.publish("getDataResponse", json.dumps(d))
 
 
-def getAllPeople() -> []:
+def getAllPeople() -> list[str]:
     people = []
-    with open(JSONPath, "r") as file:
+    with open(JSONPath, "r", encoding='utf-8') as file:
         data = json.load(file)
         for d in data:
             people.append(d["personId"])
