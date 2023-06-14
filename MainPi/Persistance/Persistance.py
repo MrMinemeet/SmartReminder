@@ -102,8 +102,6 @@ def removeTask(id: int):
             client.publish("removeTaskResponse", json.dumps(t))
             tasks.remove(t)
 
-            print(tasks)
-
             with open(JSONPath, "w") as file:
                 json.dump(tasks, file)
 
