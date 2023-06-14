@@ -91,11 +91,13 @@ def try_detect_tasks_for_person():
         print("Face locations:", face_locations)
         face_encodings = face_recognition.face_encodings(snap, face_locations)
         print("Face encodings:", face_encodings)
-        results = face_recognition.compare_faces(images, face_encodings)
-        if len(results) > 0:
-            print("Face found")
-            first_match_index = results.index(True)
-            return tasks[first_match_index]
+        if len(face_encodings) > 0:
+            face_encodings = face_encodings[0]
+            results = face_recognition.compare_faces(images, face_encodings)
+            if len(results) > 0:
+                print("Face found")
+                first_match_index = results.index(True)
+                return tasks[first_match_index]
     print("No face detected")
     return None
 
