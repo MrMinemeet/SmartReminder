@@ -5,10 +5,9 @@ class Task:
         self.description = description
         self.personName = personName
         self.date = date
-        self.state = False
 
     def __str__(self):
-        return f"{self.taskId} {self.name} {self.description} {self.personName} {self.date} {self.state}"
+        return f"{self.taskId} {self.name} {self.description} {self.personName} {self.date}"
 
     def to_json(self):
         return {
@@ -16,6 +15,5 @@ class Task:
             'name': self.name,
             'description': self.description,
             'personName': self.personName,
-            'dueDate': self.date,
-            'state': self.state
+            'dueDate': self.date
         }
