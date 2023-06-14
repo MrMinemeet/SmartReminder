@@ -95,25 +95,17 @@ def getJsonTasks() -> []:
 
 
 def removeTask(id: int):
+    print("remove")
     tasks = getJsonTasks()
     for t in tasks:
         if int(t["taskId"]) == id:
             client.publish("removeTaskResponse", json.dumps(t))
             tasks.remove(t)
 
+            print(tasks)
+
             with open(JSONPath, "w") as file:
                 json.dump(tasks, file)
-
-            with open(JSONPath, "r") as file:
-                text: str = file.read()
-
-            text = text.replace("\\", "")
-            text = text.replace("\\", "")
-            text = text.replace("\"{\"", "{\"")
-            text = text.replace("\"}\"", "\"}")
-
-            with open(JSONPath, "w") as file:
-                file.write(text)
 
 
 # save the image as jpeg somewhere and notify elias
