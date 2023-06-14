@@ -76,7 +76,7 @@ def say_todos(todos):
     for todo in todos:
         speaker.say(todo['name'])
         speaker.runAndWait()
-        speaker.say(todo['decription'])
+        speaker.say(todo['description'])
         speaker.runAndWait()
 
 def try_detect_tasks_for_person():
