@@ -104,7 +104,7 @@ APP.get('/getAllPeople', async (req, res) => {
 	});
 });
 
-APP.get('/removeTask', async (req, res) => {
+APP.get('/removeTask/:id', async (req, res) => {
 	const taskId = req.query.id;
 	CLIENT.subscribe('removeTaskResponse');
 	CLIENT.publish('removeTask', taskId);
