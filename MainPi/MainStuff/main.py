@@ -48,7 +48,7 @@ def handle_door():
     if todos is not None:
         format_string = "%d.%m.%Y"
         today = datetime.today()
-        todos = [todo for todo in todos if datetime.strptime(todo['dueDate'], format_string).date() <= today]
+        todos = [todo for todo in todos if datetime.strptime(todo['dueDate'], format_string).date() == today]
         print("Showing todos")
         display_todos(todos)
         say_todos(todos)
