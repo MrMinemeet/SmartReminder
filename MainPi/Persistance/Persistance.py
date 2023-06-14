@@ -166,7 +166,7 @@ if __name__ == '__main__':
     client.on_connect = on_connect
     client.on_message = on_message
 
-    client.connect("iot.soft.uni-linz.ac.at", 1883, keepalive=60)
+    client.connect("main.local", 1883, keepalive=60)
     try:
         client.loop_forever()
     except (KeyboardInterrupt, SystemExit):
