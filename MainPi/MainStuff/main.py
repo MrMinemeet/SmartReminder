@@ -87,7 +87,7 @@ def try_detect_tasks_for_person():
         print("Looking for face")
         snap = np.empty((camera.resolution[1], camera.resolution[0], 3), dtype=np.uint8)
         camera.capture(snap, format='rgb') # TODO optimize image (rescale, ...)
-        camera.capture("output.png", format='rgb')
+        camera.capture("output.png")
         face_locations = face_recognition.face_locations(snap)
         print("Face locations:", face_locations)
         face_encodings = face_recognition.face_encodings(snap, face_locations)
