@@ -113,10 +113,13 @@ def reload_tasks():
         images = []
 
         people_groups = groupby(data, key=lambda x: x['personName'])
-        for person, person_tasks in people_groups:
+        for person, person_tasks_group in people_groups:
             face_image = face_recognition.load_image_file(f'{DATA_PATH}{person}.png')
             face_encoding = face_recognition.face_encodings(face_image)[0]
             images.append(face_encoding)
+            person_tasks = []
+            for task in person_tasks_group:
+                person_tasks.append(task)
             tasks.append(person_tasks)
 
 def main():
