@@ -52,13 +52,12 @@ def handle_door():
         print("Done showing todos")
 
 def display_todos(todos):
-    #TODO Due date
     global display
     image = Image.new("RGB", (display.height, display.width))
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, display.height, display.width),
                    outline=0, fill=(0, 0, 0))
-    draw.text((0, 0), todos[0]['name'], fill="#FFFFFF")
+    draw.text((0, 0), ''.join([todo['name'] + '\n' for todo in todos]), fill="#FFFFFF")
     image = image.transpose(Image.FLIP_LEFT_RIGHT)
     display.image(image)
 
