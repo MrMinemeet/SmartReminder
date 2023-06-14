@@ -124,7 +124,7 @@ APP.get('/getAllPeople', async (req, res) => {
 });
 
 APP.get('/removeTask/:id', async (req, res) => {
-	const taskId = req.query.id;
+	const taskId = req.params.id;
 	CLIENT.subscribe('removeTaskResponse');
 	CLIENT.publish('removeTask', taskId);
 	const response = await new Promise((resolve, reject) => {
