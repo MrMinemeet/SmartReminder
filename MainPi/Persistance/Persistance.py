@@ -130,7 +130,7 @@ def getAllPeople() -> list[str]:
     with open(JSONPath, "r", encoding='utf-8') as file:
         data = json.load(file)
         for d in data:
-            people.append(d["personId"])
+            people.append(d["personName"])
 
     client.publish("getAllPeopleResponse", json.dumps(people))
 
