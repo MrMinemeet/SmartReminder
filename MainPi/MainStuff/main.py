@@ -47,8 +47,8 @@ def handle_door():
     todos = try_detect_tasks_for_person()
     if todos is not None:
         format_string = "%d.%m.%Y"
-        today = datetime.now().date()
-        todos = [todo for todo in todos if datetime.strptime(todo['dueDate'], format_string) <= today]
+        today = datetime.today()
+        todos = [todo for todo in todos if datetime.strptime(todo['dueDate'], format_string).date() <= today]
         print("Showing todos")
         display_todos(todos)
         say_todos(todos)
