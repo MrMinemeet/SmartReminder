@@ -69,6 +69,8 @@ def addTask(jsonStr: str):
     with open(JSONPath, "w", encoding='utf-8') as file:
         json.dump(tasks, file)
 
+    client.publish("addTaskResponse", json.dumps(task))
+
 #def addTask(name: str, personName: str, description: str, dueDate: str):
 #    global index
 #    task = Task.Task(name, description, personName, index, dueDate)
@@ -119,10 +121,15 @@ def getData(payload: str):
     date = data["date"]
     name = data["personName"]
 
+    tasks = []
+
     data = getJsonTasks()
     for d in data:
-        if d["dueDate"] == date and d["personId"] == name:
-            client.publish("getDataResponse", json.dumps(d))
+        if d["dueDate"] == date and d["personName"] == name:
+            tasks.append(d)
+    
+
+    client.publish("getDataResponse", json.dumps(tasks))
 
 
 def getAllPeople() -> list[str]:
@@ -131,6 +138,9 @@ def getAllPeople() -> list[str]:
         data = json.load(file)
         for d in data:
             people.append(d["personName"])
+
+    # Make people unique
+    people = list(dict.fromkeys(people))
 
     client.publish("getAllPeopleResponse", json.dumps(people))
 

@@ -25,10 +25,29 @@ APP.post('/addImage/:personName', (req, res) => {
 	res.status(200).send();
 });
 
-APP.post('/addTask', (req, res) => { 
+APP.post('/addTask', async (req, res) => { 
 	// Just send the recieved data over MQTT to the broker
-	res.send('addTask ' + req.body);
-	CLIENT.publish('addTask', req.body);
+	CLIENT.subscribe('addTaskResponse');
+	CLIENT.publish('addTask', JSON.stringify(req.body));
+	// Await response from broker
+	const response = await new Promise((resolve, reject) => {
+		CLIENT.on('message', (topic, message) => {
+			if (topic === 'addTaskResponse') {
+				resolve(message.toString());
+		  	}
+		});
+		setTimeout(() => {
+		  reject(new Error('Timeout for addTaskResponse'));
+		}, 5000); // Set a timeout of 5 seconds
+	}).then((response) => {
+		console.log('Response:', response);
+		res.send(response);
+	}).catch((error) => {
+		console.error(error.message);
+		res.status(504).send(error.message);
+	}).finally(() => {
+		CLIENT.unsubscribe('addTaskResponse');
+	});
 });
 
 APP.get('/getTask', async (req, res) => {
