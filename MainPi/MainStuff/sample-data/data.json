@@ -4,13 +4,13 @@
         "name": "Do the dishes",
         "description": "i dunno what to say, just do them?",
         "personName": "Julia",
-        "dueDate": "???"
+        "dueDate": "14.06.2023"
     },
     {
         "taskId": 1,
         "name": "Clean the sofa",
-        "description": "Again, i dunno what to say, just do them?",
+        "description": "Buy this weird device that Alex was talking about",
         "personName": "Julia",
-        "dueDate": "???"
+        "dueDate": "15.06.2023"
     }
 ]
