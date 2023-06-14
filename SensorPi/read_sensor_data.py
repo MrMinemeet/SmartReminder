@@ -18,7 +18,7 @@ def sensorCallback(channelHall, channelPressure):
               # Open door
               print("Person opened the door " + stamp)
 
-              broker = "mqtt.example.com"
+              broker = "192.168.18.16"
               port = 1883
 
               client = mqtt.Client()
@@ -30,8 +30,8 @@ def sensorCallback(channelHall, channelPressure):
               # send message to broker
               client.publish("door", "Person opened the door")
 
+              time.sleep(5) # wait before checking for open door again
               break
-    time.sleep(5) # wait before checking for open door again
 
 def main():
   try:
