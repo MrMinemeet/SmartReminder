@@ -21,7 +21,7 @@ APP.use((req, res, next) => {
 APP.post('/addImage/:personName', (req, res) => {
 	const image = req.body;
 	const personName = req.params.personName;
-	const jsonData = JSON.stringify({personName, image});
+	CLIENT.publish('addImage', JSON.stringify({personName, image}));
 	res.status(200).send();
 });
 
