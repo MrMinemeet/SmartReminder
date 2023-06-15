@@ -12,6 +12,7 @@ import busio
 import digitalio
 from board import SCK, MOSI, MISO, CE0, D24, D25
 from datetime import datetime
+import cv2
 
 CS_PIN = CE0
 DC_PIN = D25
@@ -23,7 +24,7 @@ DATA_PATH = 'sample-data/'
 DATA_FILE = 'data.json'
 DOOR_TOPIC = 'door'
 UPDATE_PERSON_TOPIC = 'update-person'
-DETECTION_TIMEOUT_MS = 2000
+DETECTION_TIMEOUT_MS = 10000
 
 tasks = []
 images = []
@@ -75,7 +76,10 @@ def clear_display():
 
 def say_todos(todos):
     global speaker
-    # TODO due date
+    if len(todos) == 0:
+        speaker.say('Welcome home')
+        speaker.runAndWait()
+        return
     for todo in todos:
         speaker.say(todo['name'])
         speaker.runAndWait()
@@ -83,26 +87,29 @@ def say_todos(todos):
         speaker.runAndWait()
 
 def try_detect_tasks_for_person():
-    ttime = time.time()
     global camera
     global tasks
-    while time.time() - ttime < DETECTION_TIMEOUT_MS * 1000:
+    ttime = time.time()
+    while time.time() - ttime < DETECTION_TIMEOUT_MS / 1000: #retry for 10 seconds
         print("Looking for face")
         snap = np.empty((camera.resolution[1], camera.resolution[0], 3), dtype=np.uint8)
-        camera.capture(snap, format='rgb') # TODO optimize image (rescale, ...)
-        face_locations = face_recognition.face_locations(snap)
+        camera.capture(snap, format='rgb') #take photo
+        frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5) #resize for faster face detection
+        face_locations = face_recognition.face_locations(frame) #find face locations
         print("Face locations:", face_locations)
-        face_encodings = face_recognition.face_encodings(snap, face_locations)
-        print("Face encodings:", face_encodings)
-        if len(face_encodings) > 0:
+        face_encodings = face_recognition.face_encodings(frame, face_locations)
+        if len(face_encodings) > 0: #if we found at least 1 face
             face_encodings = face_encodings[0]
+            #check if the first found face is a known user
             results = face_recognition.compare_faces(images, face_encodings)
             if len(results) > 0:
+                #if we find a match, return this persons todos
                 print("Face found")
                 first_match_index = results.index(True)
-                print(tasks)
                 return tasks[first_match_index]
-            print("No known face found")
+            else:
+                print("No known face found")
+                return None
     print("No face detected")
     return None
 
