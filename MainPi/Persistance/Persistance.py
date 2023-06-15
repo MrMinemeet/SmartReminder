@@ -137,12 +137,15 @@ def getData(payload: str):
 
 
 def getAllPeople():
-    # TODO: get app people not only those which have tasks. Look at images folder
     people = []
-    with open(JSONPath, "r", encoding='utf-8') as file:
-        data = json.load(file)
-        for d in data:
-            people.append(d["personName"])
+    # Check if "image" directory exists
+    if os.path.exists(imagePath):
+        # List all files in directory
+        files = os.listdir(imagePath)
+        for f in files:
+            # Remove file extension and add to list
+            people.append(f.split(".")[0])
+
 
     # Make people unique
     people = list(dict.fromkeys(people))
