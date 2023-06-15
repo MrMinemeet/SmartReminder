@@ -86,6 +86,10 @@ def addTask(jsonStr: str):
 
 
 def getJsonTasks() -> list[dict]:
+    if not os.path.exists(JSONPath):
+        with open(JSONPath, "w", encoding='utf-8') as file:
+            json.dump([], file)
+            return []
     with open(JSONPath, "r", encoding='utf-8') as file:
         if os.path.getsize(JSONPath) == 0:
             return []
@@ -132,7 +136,7 @@ def getData(payload: str):
     client.publish("getDataResponse", json.dumps(tasks))
 
 
-def getAllPeople() -> list[str]:
+def getAllPeople():
     # TODO: get app people not only those which have tasks. Look at images folder
     people = []
     with open(JSONPath, "r", encoding='utf-8') as file:
@@ -155,6 +159,10 @@ def convert_base64_to_jpg(base64_string, personName):
 
     # Open the image using PIL
     image = Image.open(image_stream)
+
+    # Check if "image" directory exists
+    if not os.path.exists(imagePath):
+        os.mkdir(imagePath)
 
     # Save the image as PNG
     image.save(os.path.join(imagePath, personName)+".png", 'PNG')
