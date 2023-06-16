@@ -3,22 +3,24 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-const BASE_URL = 'http://localhost:8080';
+const BASE_URL = 'http://192.168.30.139:8080';
 
 class Task {
   final int taskId;
   final String name;
   final String description;
   final DateTime dueDate;
+  final String personName;
   bool isDone = false;
 
-  Task({ required this.taskId, required this.name, required this.description, required this.dueDate, isDone});
+  Task({ required this.taskId, required this.name, required this.description, required this.dueDate, required this.personName, isDone});
 
   factory Task.fromJson(Map<String, dynamic> json) {
     var dateFormatter = DateFormat('dd.MM.yyyy');
     return Task(
       taskId: int.parse(json['taskId'].toString()),
       name: json['name'],
+      personName: json['personName'],
       description: json['description'],
       dueDate: dateFormatter.parse(json['dueDate'])
     );
@@ -30,6 +32,7 @@ class Task {
       'taskId': taskId.toString(),
       'name': name,
       'description': description,
+      'personName': personName,
       'dueDate': dateFormatter.format(dueDate)
     };
   }
@@ -55,7 +58,7 @@ class User {
 class ApiService {
   static Future<List<User>> getUsers() async {
   
-    const String url = '$BASE_URL/getAllPerson';
+    const String url = '$BASE_URL/getAllPeople';
   
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
@@ -88,11 +91,8 @@ class ApiService {
     final response = await http.post(
       Uri.parse(url), body: profileImage
     );
-        if (response.statusCode == 200 || response.statusCode == 201) {
-        final jsonData = json.decode(response.body) as dynamic;
-        final user= User(name: jsonData);
-        
-        return user;
+    if (response.statusCode == 200 || response.statusCode == 201) {  
+      return user;
     }
    
     throw Exception('Failed to add user. ${response.statusCode}');
@@ -106,12 +106,24 @@ class ApiService {
 
     if (response.statusCode == 200 || response.statusCode == 201) {
       final jsonData = json.decode(response.body) as dynamic;
-      final task= Task.fromJson(jsonData);
-        
+      final task= Task.fromJson(jsonData);  
       return task;
     }
    
     throw Exception('Failed to add task. ${response.statusCode}');
+  }
+
+  static Future<Task> deleteTask(Task task) async {
+    final String url = '$BASE_URL/removeTask/${task.taskId}';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body) as dynamic;
+        final task = Task.fromJson(jsonData);
+        return task;
+    }
+   
+    throw Exception('Failed to delete task.');
+    
   }
 
 }
