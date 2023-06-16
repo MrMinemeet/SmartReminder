@@ -558,7 +558,7 @@ class _ProfileState extends State<ProfileScreen> {
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(20),
-                          child: TaskForm(selectedDate: _selectedDate, addNewTask: _addNewTask),
+                          child: TaskForm(selectedDate: _selectedDate, addNewTask: _addNewTask, user: widget.user!),
                         ),
                       ),
                     )
@@ -588,8 +588,9 @@ class _ProfileState extends State<ProfileScreen> {
 
 class TaskForm extends StatefulWidget {
   final DateTime selectedDate;
+  final User user;
   final void Function(Task task) addNewTask;
-  TaskForm({required this.selectedDate, required this.addNewTask});
+  TaskForm({required this.selectedDate, required this.addNewTask, required this.user});
   @override
   _TaskFormState createState() => _TaskFormState();
 }
@@ -616,7 +617,7 @@ class _TaskFormState extends State<TaskForm> {
       setState(() {
         _formValid = true;
       });
-      widget.addNewTask(Task(taskId: 0,name: _nameController.text, description: _describtionController.text, dueDate: widget.selectedDate));
+      widget.addNewTask(Task(taskId: 0,name: _nameController.text, description: _describtionController.text, dueDate: widget.selectedDate, personName: widget.user.name));
     }
   }
 
@@ -714,6 +715,12 @@ class TaskListWidget extends StatefulWidget {
 class _TaskListWidgetState extends State<TaskListWidget> {
   final DateFormat _dateFormat = DateFormat('EEE, dd MMMM');
 
+  
+  void _handleDeletePressed() async {
+      widget.tasks.where((task) => task.isDone).forEach((task) async =>
+          ApiService.deleteTask(task).then((value) => setState(() {widget.tasks.remove(task);})));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -748,7 +755,7 @@ class _TaskListWidgetState extends State<TaskListWidget> {
             padding: EdgeInsets.zero,
             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           ),
-          onPressed: () { /*TODO: delete tasks*/},
+          onPressed: () { _handleDeletePressed();},
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
             decoration: BoxDecoration(
