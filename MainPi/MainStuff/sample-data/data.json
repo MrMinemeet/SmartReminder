@@ -1,0 +1,23 @@
+[
+    {
+        "taskId": 0,
+        "name": "Do the dishes",
+        "description": "i dunno what to say, just do them?",
+        "personName": "Julia",
+        "dueDate": "14.06.2023"
+    },
+    {
+        "taskId": 1,
+        "name": "Clean the sofa",
+        "description": "Buy this weird device that Alex was talking about",
+        "personName": "Julia",
+        "dueDate": "14.06.2023"
+    },
+    {
+        "taskId": 2,
+        "name": "Clean the sofa again",
+        "description": "Buy this weird device that Alex was talking about again",
+        "personName": "Julia",
+        "dueDate": "15.06.2023"
+    }
+]
