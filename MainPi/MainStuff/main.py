@@ -20,10 +20,11 @@ RESET_PIN = D24
 BAUDRATE = 24000000
 MOSQUITTO_SERVER_IP = 'main.local'
 MOSQUITTO_SERVER_PORT = 1883
-DATA_PATH = 'sample-data/'
-DATA_FILE = 'data.json'
+DATA_PATH = '../Persistance/'
+DATA_FILE = 'datafile.json'
+IMAGE_FOLDER = 'images/'
 DOOR_TOPIC = 'door'
-UPDATE_PERSON_TOPIC = 'update-person'
+UPDATE_PERSON_TOPIC = 'update'
 DETECTION_TIMEOUT_MS = 10000
 
 tasks = []
@@ -123,7 +124,7 @@ def reload_tasks():
 
         people_groups = groupby(data, key=lambda x: x['personName'])
         for person, person_tasks_group in people_groups:
-            face_image = face_recognition.load_image_file(f'{DATA_PATH}{person}.png')
+            face_image = face_recognition.load_image_file(f'{DATA_PATH}{IMAGE_FOLDER}{person}.png')
             face_encoding = face_recognition.face_encodings(face_image)[0]
             images.append(face_encoding)
             person_tasks = []
